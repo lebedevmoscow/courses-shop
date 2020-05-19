@@ -1,5 +1,5 @@
 import React from 'react'
-import {Switch, Route} from 'react-router-dom'
+import {Switch, Route, Redirect} from 'react-router-dom'
 import { LinksPage } from './pages/LinksPage'
 import { CreatePage } from './pages/CreatePage'
 import { DetailPage } from './pages/DetailPage'
@@ -16,10 +16,10 @@ export const useRoutes = (isAuth) => {
                 <Route path="/create" exact>
                     <CreatePage />
                 </Route>
-                <Route path="/detail/:id" exact>
+                <Route path="/detail/:id">
                     <DetailPage />
                 </Route>
-                
+                <Redirect to="/create"/> 
             </Switch>
         )
     }
@@ -27,9 +27,10 @@ export const useRoutes = (isAuth) => {
     // TODO: Made 404 redirect if none of thoose roures has worked.
     return (
         <Switch>
-            <Route to="/" exact>
+            <Route path="/" exact>
                 <AuthPage />
             </Route>
+            <Redirect to="/"/> 
         </Switch>
     )
 

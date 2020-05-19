@@ -53,7 +53,7 @@ router.post(
     try {
 
         const errors = validationResult(req)
-        if (errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return res.status(400).json({
                 errors: errors.array(),
                 message: 'Некорректные данные при входе в систему'
@@ -66,8 +66,8 @@ router.post(
         if (!user) {
             return res.status(400).json({message: 'Пользователен не найден'})
         }
-        const isMatch = await bcrypt.compare(password, user.passowrd)
-        
+        const isMatch = await bcrypt.compare(password, user.password)
+
         if (!isMatch) {
             return res.status(400).json({message: 'Неверные данные при входе'})
         }
@@ -77,10 +77,10 @@ router.post(
             config.get('jwtSecret'),
             { expiresIn: '1h' }
         )
-
-        req.status(200).json({token, userId: user.id})
+        res.status(200).json({token, userId: user.id})
 
     } catch (e) {
+        console.log('e', e)
         res.status(500).json({message: 'Что-то пошло не так, попробуйте позже.'})
     }
 })
