@@ -1,43 +1,44 @@
-const {Router}  = require('express')
-const User = require('../models/User')
+const {Router} = require('express')
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 const config = require('config')
+const jwt = require('jsonwebtoken')
 const {check, validationResult} = require('express-validator')
+const User = require('../models/User')
 const router = Router()
 
+// /api/auth/register
 router.post(
     '/register',
     [
         check('email', 'Некорректно введен email адресс').isEmail(),
-        check('password', 'Минимальная длина пароля - 6 символов').isLength({min: 6})
+        check('password', 'Минимальная длина пароля - 3 символа').isLength({min: 3})
     ],
     async (req, res) => {
     try {
-
         const errors = validationResult(req)
-        if (errors.isEmpty()) {
+        if (!errors.isEmpty()) {
             return res.status(400).json({
                 errors: errors.array(),
                 message: 'Некорректные данные при регистрации'
             })
         }
 
-        const {email, passowrd} = req.body
+        const {email, password} = req.body
+        // console.log('email', email)
 
         const candidate = await User.findOne({email})
         if (candidate) {
             return res.statis(400).json({message: 'Такой пользователь уже существует... '})
         }
-
-        const hashedPassword = await bcrypt.hash(passowrd, 12)
-        const user = new User({email, hashedPassword})
+        const hashedPassword = await bcrypt.hash(password, 2)
+        const user = new User({email, password: hashedPassword})
         await user.save()
 
         res.status(201).json({message: 'Успешно! Пользователь создан!'})
 
 
     } catch (e) {
+        console.log('error', e)
         res.status(500).json({message: 'Ошибка при регистраци... Попробуйте чуть позже.'})
     }
 })
